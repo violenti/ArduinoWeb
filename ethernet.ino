@@ -7,6 +7,7 @@ Developer by David Fernandez
 October 2014, Argentina, Buenos Aires.
 License under MIT 
 */
+/* Fixed create html 2014-11-18*/
 #include <SPI.h>
 #include <Ethernet.h>
 
