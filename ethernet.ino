@@ -9,11 +9,8 @@ License under MIT
 */
 #include <SPI.h>
 #include <Ethernet.h>
-#include <dht.h>
 
-dht DHT;
 
-#define DHT11_PIN 5
 int Valor; 
 
 // Configuración de direccion MAC e IP.
@@ -26,13 +23,16 @@ EthernetServer server(8080);
 void setup() {
 // Inicia el puerto serie.
 Serial.begin(9600);
- 
+  while (!Serial) {
+    ; // wait for serial port to connect. Needed for Leonardo only
+  }
+
 // Inicia la conexión Ethernet y el servidor.
 Ethernet.begin(mac, ip);
 server.begin();
 Serial.print("IP local del servidor ");
 Serial.println(Ethernet.localIP());
-Serial.println("Type,\tstatus,\tHumidity (%),\tTemperature (C)");
+
 }
  
 void loop() {
@@ -49,18 +49,18 @@ EthernetClient client = server.available(); // Escucha a los clientes entrantes.
                 client.println("HTTP/1.1 200 OK"); // Enviar un encabezado de respuesta HTTP estándar
                 client.println("Content-Type: text/html");
                 client.println("Connection: close"); // Se cerrará la conexiós despues de enviar la respuesta.
-                client.println("Refresh: 5"); // Refrescar automáticamente la página después de 5 segundos.
+                client.println("Refresh: 5");
+                client.println(); // Refrescar automáticamente la página después de 5 segundos.
                 client.println("<!DOCTYPE HTML>"); // Tipo de documento.
                 client.println("<html>"); // Etiqueta html inicio del documento. 
                 Valor = analogRead(0); 
-                client.println( "Control Domotico de plantas");
-                client.println("<body>");
-                client.println("Sensor de Humedad de suelo:");
+                Serial.println( "Control Domotico de plantas");
+                Serial.println("Sensor de Humedad de suelo:");
                 client.println(Valor);
                 if ((Valor > 300) and (Valor <= 700)) 
-                    client.print("<p>Humedo, no regar</p>");
+                    client.println("Humedo, no regar");
                  if(Valor > 700)
-                    client.print("Encharcado");   
+                    client.println("Encharcado");   
                 client.println("<br />"); // Etiqueta html salto de linea. 
                 client.println("</html>"); // Etiqueta html fin del documento.
                 break;
@@ -76,6 +76,6 @@ EthernetClient client = server.available(); // Escucha a los clientes entrantes.
     delay(2000); // Espera para dar tiempo al navegador a recivir los datos.
     client.stop(); // Cierra la conexión.
     Serial.println("Cliente desconectado");
-    Serial.println();
+    
     }
 }
